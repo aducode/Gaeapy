@@ -14,6 +14,7 @@ import types
 from protocol.protocol import SerializeType, CompressType
 from invoker import invoker
 
+
 class Proxy(object):
     """
     代理类
