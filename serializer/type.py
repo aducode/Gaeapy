@@ -282,7 +282,7 @@ class List(ProtocolType):
     @classmethod
     def serialize(cls, value, ctx):
         type_id = register.get_id(cls)
-        is_ref, hash_code = ctx.is_ref()
+        is_ref, hash_code = ctx.is_ref(value)
         ctx.write(struct.pack('<i?i', type_id, is_ref, hash_code))
         if is_ref:
             return
@@ -319,7 +319,7 @@ class KeyValue(ProtocolType):
     @classmethod
     def serialize(cls, value, ctx):
         type_id = register.get_id(cls)
-        is_ref, hash_code = ctx.is_ref()
+        is_ref, hash_code = ctx.is_ref(value)
         ctx.write(struct.pack('<i?i', type_id, is_ref, hash_code))
         if is_ref:
             return
@@ -362,7 +362,7 @@ class Array(ProtocolType):
     def serialize(cls, value, ctx):
         _type = cls.__generics__
         type_id = register.get_id(_type)
-        is_ref, hash_code = ctx.is_ref()
+        is_ref, hash_code = ctx.is_ref(value)
         ctx.write(struct.pack('<i?i', type_id, is_ref, hash_code))
         if is_ref:
             return
@@ -411,7 +411,7 @@ class Map(ProtocolType):
     @classmethod
     def serialize(cls, value, ctx):
         type_id = register.get_id(cls)
-        is_ref, hash_code = ctx.is_ref()
+        is_ref, hash_code = ctx.is_ref(value)
         ctx.write(struct.pack('<i?i', type_id, is_ref, hash_code))
         if is_ref:
             return
@@ -458,7 +458,7 @@ class Set(ProtocolType):
     @classmethod
     def serialize(cls, value, ctx):
         type_id = register.get_id(cls)
-        is_ref, hash_code = ctx.is_ref()
+        is_ref, hash_code = ctx.is_ref(value)
         ctx.write(struct.pack('<i?i', type_id, is_ref, hash_code))
         if is_ref:
             return
@@ -500,7 +500,7 @@ class Serializable(ProtocolType):
     @classmethod
     def serialize(cls, value, ctx):
         type_id = register.get_id(cls)
-        is_ref, hash_code = ctx.is_ref()
+        is_ref, hash_code = ctx.is_ref(value)
         ctx.write(struct.pack('<i?i', type_id, is_ref, hash_code))
         if is_ref:
             return

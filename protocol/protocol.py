@@ -82,7 +82,9 @@ class Protocol(object):
                 platform=Platform.format(self.platform))
 
     def to_bytes(self):
-        msg_data = self.msg.serialize()
+        ctx = Context()
+        self.msg.__class__.serialize(self.msg, ctx)
+        msg_data = ctx.data
         self.msg_len = len(msg_data)
         return struct.pack('<biibbbbb',
                            self.version,

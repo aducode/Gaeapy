@@ -11,21 +11,29 @@
 
 from client import proxy
 from decorator import operation, service
-from serializer import String
+from serializer import String, Int32, Array
+from serializer import Serializable, serializable
+
+@serializable(
+    value=Int32,
+    message=String,
+)
+class Test(Serializable):
+    pass
 
 
-@proxy(('127.0.0.1', 8080))
+@proxy(('127.0.0.1', 16002))
 @service()
-class Test(object):
+class TestService(object):
 
-    def __init__(self, value):
-        self.value = value
-
-    @operation(name='fuck', args=(String, ), ret=String)
-    def say(self, msg):
-        print self.value, msg
-
+    @operation(args=(Array(Int32), Test, Int32, String), ret=Test)
+    def getTest(self, int_array, test, i, s):
+        pass
 
 if __name__ == '__main__':
-    t=Test(1)
-    t.say('fuck')
+    test_service = TestService()
+    t1 = Test()
+    t1.value = 100
+    t1.message = "hello"
+    t2 = test_service.getTest(Array(Int32)([1, 2, 3]), t1, 111, "world")
+    print t2

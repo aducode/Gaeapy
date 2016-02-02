@@ -18,7 +18,7 @@ class ProtocolTypeRegister(object):
 
     def reg(self, *args):
         if len(args) < 2:
-            raise ReferenceError()
+            raise RuntimeError()
         value = args[-1]
         keys = args[:-1]
         for key in keys:
