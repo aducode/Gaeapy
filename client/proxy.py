@@ -29,7 +29,6 @@ class Proxy(object):
         :return: 代理类
         """
         self.implement = implement
-        print '-----', services
         self.services = list(services)
         self.serialize = serialize
         self.compress = compress

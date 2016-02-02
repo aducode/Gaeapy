@@ -139,10 +139,7 @@ def get_msg_type(msg):
     outpara=array(ProtocolType),
 )
 class ResponseProtocol(Serializable):
-
-    def __init__(self, result=None, outpara=None):
-        self.result = result
-        self.outpara = outpara
+    pass
 
 
 @serializable(

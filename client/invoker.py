@@ -15,10 +15,15 @@ from protocol.protocol import MsgType, Platform
 from protocol.protocol import Protocol, RequestProtocol, KeyValuePair
 
 
-def recv(conn):
-    data = ''
+def recv_data(conn, buf_size=1024):
+
+    _data = ''
     while True:
-        conn.recv(1024)
+        _in_buf = conn.recv(buf_size)
+        _data += _in_buf if _in_buf else ''
+        if (len(_in_buf) if _in_buf else 0) < buf_size:
+            break
+    return _data
 
 
 def invoker(proxy, func):
@@ -30,24 +35,20 @@ def invoker(proxy, func):
         request.methodName = func.__method_name__
         request.paraKVList = [KeyValuePair(_type.__name__, value)
                               for _type, value in zip(func.__args__, args)]
-        protocol = Protocol(msg=request,
+        send_protocol = Protocol(msg=request,
                             msg_type=MsgType.Request,
                             compress_type=proxy.compress,
                             serialize_type=proxy.serialize,
                             platform=Platform.Java)
 
-        client = socket(AF_INET, SOCK_STREAM)
-        print proxy.address
-        client.connect(proxy.address)
-        client.send(protocol.to_bytes())
-
-
-
-        print '-'*10
-        print request.lookup
-        print request.methodName
-        print [str(kv) for kv in request.paraKVList]
-        res = func(*args)
-        return res
+        conn = socket(AF_INET, SOCK_STREAM)
+        conn.connect(proxy.address)
+        conn.send(send_protocol.to_bytes())
+        data = recv_data(conn)
+        receive_protocol = Protocol.from_bytes(data)
+        assert(receive_protocol.msg_type == MsgType.Response)
+        response = receive_protocol.msg
+        # res = func(*args)
+        return response.result
 
     return _func
