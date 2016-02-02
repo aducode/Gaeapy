@@ -192,7 +192,13 @@ class ResetProtocol(Serializable):
     value=ProtocolType,
 )
 class KeyValuePair(Serializable):
-    pass
+
+    def __init__(self, name, value):
+        self.name = name
+        self.value = value
+
+    def __str__(self):
+        return 'name={name}, value={value}'.format(name=self.name, value=self.value)
 
 __MSG_MAP__ = {
     MsgType.Response: ResponseProtocol,

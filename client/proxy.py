@@ -19,25 +19,32 @@ class Proxy(object):
     """
     代理类
     """
-    def __init__(self, instance, services, serialize=SerializeType.GAEABinary, compress=CompressType.UnCompress):
+    def __init__(self, implement, services, serialize=SerializeType.GAEABinary, compress=CompressType.UnCompress):
         """
 
-        :param instance: 代理的类
+        :param implement: 代理的类
         :param services: 服务器地址
         :param serialize: 序列化类型
         :param compress: 压缩方式
         :return: 代理类
         """
-        self.instance = instance
+        self.implement = implement
         self.services = set(services)
         self.serialize = serialize
         self.compress = compress
+        self.__current_address_idx = 0
+
+    @property
+    def address(self):
+        _address = self.services[self.__current_address_idx]
+        self.__current_address_idx = (self.__current_address_idx + 1) % len(self.services)
+        return _address
 
     def __getattr__(self, item):
-        if hasattr(self.instance, item):
-            attr = getattr(self.instance, item)
+        if hasattr(self.implement, item):
+            attr = getattr(self.implement, item)
             if isinstance(attr, types.MethodType) and hasattr(attr, '__method_name__'):
-                return invoker(attr)
+                return invoker(self, attr)
             else:
                 return attr
         else:
