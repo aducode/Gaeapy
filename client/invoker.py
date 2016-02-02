@@ -43,7 +43,8 @@ def invoker(proxy, func):
 
         conn = socket(AF_INET, SOCK_STREAM)
         conn.connect(proxy.address)
-        conn.send(send_protocol.to_bytes())
+        serialized = send_protocol.to_bytes()
+        conn.send(serialized)
         data = recv_data(conn)
         receive_protocol = Protocol.from_bytes(data)
         assert(receive_protocol.msg_type == MsgType.Response)

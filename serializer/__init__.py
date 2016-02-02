@@ -10,7 +10,7 @@
 """
 import types
 
-from type import ProtocolType as _ProtocolType
+from type import Any
 
 from type import Null
 from type import Bool
@@ -31,8 +31,8 @@ from type import Set
 from type import Map
 from type import KeyValue
 
-from type import array as _array
-from type import Array as _Array
+from type import array as __array
+from type import Array as __Array
 
 from type import enum
 
@@ -56,6 +56,6 @@ def Array(para):
     :return:
     """
     if isinstance(para, types.TypeType):
-        return _array(para)
+        return __array(para)
     else:
-        return _Array(para)
+        return __Array(para)

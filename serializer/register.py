@@ -29,7 +29,11 @@ class ProtocolTypeRegister(object):
         return self.__registed_types__.get(key, None)
 
     def get_id(self, t):
-        return self.__registed_type_id__.get(t, None)
+        type_id = self.__registed_type_id__.get(t, None)
+        if type_id is None:
+            # Array的子类与Array的type_id相同
+            type_id = self.__registed_type_id__.get(t.__base__)
+        return type_id
 
 
 register = ProtocolTypeRegister()

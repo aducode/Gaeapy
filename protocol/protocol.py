@@ -13,7 +13,7 @@ import struct
 from serializer.context import Context
 from serializer.type import enum
 from serializer.type import Serializable, serializable
-from serializer.type import ProtocolType, String, List, array, Int32
+from serializer.type import Any, String, List, array, Int32
 
 MsgType = enum(
         Response=1,
@@ -137,8 +137,8 @@ def get_msg_type(msg):
 
 
 @serializable(
-    result=ProtocolType,
-    outpara=array(ProtocolType),
+    result=Any,
+    outpara=array(Any),
 )
 class ResponseProtocol(Serializable):
     pass
@@ -188,7 +188,7 @@ class ResetProtocol(Serializable):
 @serializable(
     'RpParameter',
     name=String,
-    value=ProtocolType,
+    value=Any,
 )
 class KeyValuePair(Serializable):
 

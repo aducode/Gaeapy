@@ -46,6 +46,8 @@ class ProtocolType(object):
         """
         raise NotImplementedError()
 
+Any = ProtocolType
+
 
 class Null(ProtocolType):
 
@@ -373,10 +375,9 @@ class Array(ProtocolType):
             ctx.write(arr)
         else:
             for item in arr:
-                _item_type, _item = decide(item)
-                _item_type_id = register.get_id(_item_type)
+                _item_type_id = register.get_id(_type)
                 ctx.write(struct.pack('<i', _item_type_id))
-                _item_type.serialize(_item, ctx)
+                _type.serialize(item, ctx)
 
     @classmethod
     def deserialize(cls, ctx):
@@ -508,9 +509,15 @@ class Serializable(ProtocolType):
         # 所以实例属性不需要像容器类型一样限定成ProtocolType类型
         # 但是如果实例属性是ProtocolType类型，也是允许的
         for desc in cls.__serialize_fields__:
-            type_id = register.get_id(desc.type_info.type)
+            _value = getattr(value, desc.name)
+            _type = desc.type_info.type
+            if _type == ProtocolType:
+                _type, _value = decide(_value)
+            else:
+                _, _value = decide(_value)
+            type_id = register.get_id(_type)
             ctx.write(struct.pack('<i', type_id))
-            desc.type_info.type.serialize(decide(getattr(value, desc.name))[1], ctx)
+            _type.serialize(_value, ctx)
 
     @classmethod
     def deserialize(cls, ctx):
@@ -658,7 +665,7 @@ def array(genercis=ProtocolType):
         return Array
     if genercis not in Array.__generics_cache__:
         new_cls = type('{name}Array'.format(name=genercis.__name__), (Array, ), {
-            '__genercis__': genercis
+            '__generics__': genercis
         })
         Array.__generics_cache__[genercis] = new_cls
     return Array.__generics_cache__[genercis]
