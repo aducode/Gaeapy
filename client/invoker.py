@@ -37,6 +37,7 @@ def invoker(proxy, func):
                             platform=Platform.Java)
 
         client = socket(AF_INET, SOCK_STREAM)
+        print proxy.address
         client.connect(proxy.address)
         client.send(protocol.to_bytes())
 

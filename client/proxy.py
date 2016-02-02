@@ -29,7 +29,8 @@ class Proxy(object):
         :return: 代理类
         """
         self.implement = implement
-        self.services = set(services)
+        print '-----', services
+        self.services = list(services)
         self.serialize = serialize
         self.compress = compress
         self.__current_address_idx = 0
@@ -52,6 +53,9 @@ class Proxy(object):
 
 
 def proxy(services, serialize=SerializeType.GAEABinary, compress=CompressType.UnCompress):
+
+    if isinstance(services, tuple) and len(services) == 2 and isinstance(services[0], str) and isinstance(services[1], int):
+        services = (services, )
 
     def deco(cls):
 
