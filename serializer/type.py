@@ -20,6 +20,8 @@ from utils import sign, decide
 
 class ProtocolType(object):
 
+    __simple_name__ = 'Object'
+
     def __init__(self, value=None):
         self.value = value
 
@@ -74,6 +76,8 @@ class BaseType(ProtocolType):
 
 class Bool(BaseType):
 
+    __simple_name__ =  'boolean'
+
     @classmethod
     def check(cls, value):
         return isinstance(value, types.BooleanType)
@@ -89,6 +93,8 @@ class Bool(BaseType):
 
 
 class Int16(BaseType):
+
+    __simple_name__ = 'short'
 
     @classmethod
     def check(cls, value):
@@ -106,6 +112,8 @@ class Int16(BaseType):
 
 class Int32(BaseType):
 
+    __simple_name__ = 'int'
+
     @classmethod
     def check(cls, value):
         return isinstance(value, types.IntType) and -(2 << 30) <= value <= ((2 << 30) - 1)
@@ -121,6 +129,8 @@ class Int32(BaseType):
 
 
 class Int64(BaseType):
+
+    __simple_name__ = 'long'
 
     @classmethod
     def check(cls, value):
@@ -138,6 +148,8 @@ class Int64(BaseType):
 
 class Character(BaseType):
 
+    __simple_name__ = 'char'
+
     @classmethod
     def check(cls, value):
         return isinstance(value, types.StringType) and len(value) == 1
@@ -154,6 +166,8 @@ class Character(BaseType):
 
 class Byte(BaseType):
 
+    __simple_name__ = 'byte'
+
     @classmethod
     def check(cls, value):
         return isinstance(value, types.IntType) and -(1 << 7) <= value <= ((1 << 7) - 1)
@@ -168,6 +182,8 @@ class Byte(BaseType):
 
 
 class Float(BaseType):
+
+    __simple_name__ = 'float'
 
     @classmethod
     def check(cls, value):
@@ -185,6 +201,8 @@ class Float(BaseType):
 
 class Double(BaseType):
 
+    __simple_name__ = 'double'
+
     @classmethod
     def check(cls, value):
         return isinstance(value, types.FloatType)
@@ -200,6 +218,8 @@ class Double(BaseType):
 
 
 class Decimal(BaseType):
+
+    __simple_name__ = 'Decimal'
 
     @classmethod
     def check(cls, value):
@@ -220,6 +240,8 @@ class Decimal(BaseType):
 
 
 class Datetime(BaseType):
+
+    __simple_name__ = 'Datetime'
 
     time_zone = 8 * 60 * 60 * 1000
 
@@ -246,6 +268,8 @@ class Datetime(BaseType):
 
 
 class String(BaseType):
+
+    __simple_name__ = 'String'
 
     @classmethod
     def check(cls, value):
@@ -276,6 +300,8 @@ class String(BaseType):
 
 
 class List(ProtocolType):
+
+    __simple_name__ = 'List'
 
     @classmethod
     def check(cls, value):
@@ -313,6 +339,8 @@ class List(ProtocolType):
 
 
 class KeyValue(ProtocolType):
+
+    __simple_name__ = 'KeyValue'
 
     @classmethod
     def check(cls, value):
@@ -353,6 +381,8 @@ class KeyValue(ProtocolType):
 
 class Array(ProtocolType):
 
+    __simple_name__ = 'Object[]'
+
     __generics__ = ProtocolType
     __generics_cache__ = dict()
 
@@ -371,13 +401,15 @@ class Array(ProtocolType):
         arr = value.value
         length = len(arr)
         ctx.write(struct.pack('<i', length))
-        if _type == Byte:
-            ctx.write(arr)
+        if issubclass(_type, BaseType):
+            for item in arr:
+                _type.serialize(item, ctx)
         else:
             for item in arr:
-                _item_type_id = register.get_id(_type)
+                _item_type, _item = decide(item)
+                _item_type_id = register.get_id(_item_type)
                 ctx.write(struct.pack('<i', _item_type_id))
-                _type.serialize(item, ctx)
+                _item_type.serialize(_item, ctx)
 
     @classmethod
     def deserialize(cls, ctx):
@@ -404,6 +436,8 @@ class Array(ProtocolType):
 
 
 class Map(ProtocolType):
+
+    __simple_name__ = 'Map'
 
     @classmethod
     def check(cls, value):
@@ -452,6 +486,8 @@ class Map(ProtocolType):
 
 class Set(ProtocolType):
 
+    __simple_name__ = 'Set'
+
     @classmethod
     def check(cls, value):
         pass
@@ -493,6 +529,8 @@ class Set(ProtocolType):
 
 
 class Serializable(ProtocolType):
+
+    __simple_name__ = 'Object'
 
     @classmethod
     def check(cls, value):
@@ -651,6 +689,7 @@ def serializable(*name, **fields):
                 else Descriptor(field_name, TypeInfo(protocol_type))
             d[sign(field_name.lower())] = desc
             setattr(cls, field_name, desc)
+        cls.__simple_name__ = cls.__serialize_name__
         cls.__serialize_fields__ = [item[1] for item in sorted(d.items(), key=lambda x:x[0])]
         register.reg(sign(cls.__serialize_name__), cls)
         return cls
@@ -665,7 +704,8 @@ def array(genercis=ProtocolType):
         return Array
     if genercis not in Array.__generics_cache__:
         new_cls = type('{name}Array'.format(name=genercis.__name__), (Array, ), {
-            '__generics__': genercis
+            '__generics__': genercis,
+            '__simple_name__': genercis.__simple_name__ + '[]'
         })
         Array.__generics_cache__[genercis] = new_cls
     return Array.__generics_cache__[genercis]

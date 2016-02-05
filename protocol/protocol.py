@@ -47,6 +47,8 @@ Platform = enum(
 
 class Protocol(object):
 
+    magic = (9, 11, 13, 17, 18)
+
     def __init__(self, session_id=0, service_id=0,
                  msg=None, msg_len=None, msg_type=None,
                  compress_type=CompressType.UnCompress,
@@ -94,10 +96,13 @@ class Protocol(object):
                            self.msg_type,
                            self.compress_type,
                            self.serialize_type,
-                           self.platform) + msg_data
+                           self.platform) + msg_data + struct.pack('<bbbbb', *self.magic)
 
     @classmethod
     def from_bytes(cls, data):
+        magic_data, data = data[:5], data[5:]
+        _magic = struct.unpack('<bbbbb', magic_data)
+        assert(_magic == cls.magic)
         (
             version,
             msg_len,

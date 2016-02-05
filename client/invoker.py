@@ -33,7 +33,7 @@ def invoker(proxy, func):
         request = RequestProtocol()
         request.lookup = proxy.implement.__class__.__service_name__
         request.methodName = func.__method_name__
-        request.paraKVList = [KeyValuePair(_type.__name__, value)
+        request.paraKVList = [KeyValuePair(_type.__simple_name__, value)
                               for _type, value in zip(func.__args__, args)]
         send_protocol = Protocol(msg=request,
                             msg_type=MsgType.Request,

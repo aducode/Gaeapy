@@ -22,7 +22,7 @@ class Test(Serializable):
     pass
 
 
-@proxy(('127.0.0.1', 16002))
+@proxy(('127.0.0.1', 9090))
 @service()
 class TestService(object):
 
