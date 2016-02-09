@@ -48,6 +48,7 @@ Platform = enum(
 class Protocol(object):
 
     magic = (9, 11, 13, 17, 18)
+    # magic = (1, 10, 13, 17, 18)
 
     def __init__(self, session_id=0, service_id=0,
                  msg=None, msg_len=None, msg_type=None,
@@ -100,7 +101,7 @@ class Protocol(object):
 
     @classmethod
     def from_bytes(cls, data):
-        magic_data, data = data[:5], data[5:]
+        data, magic_data = data[:-5], data[-5:]
         _magic = struct.unpack('<bbbbb', magic_data)
         assert(_magic == cls.magic)
         (

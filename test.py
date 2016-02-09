@@ -14,6 +14,7 @@ from decorator import operation, service
 from serializer import String, Int32, Array
 from serializer import Serializable, serializable
 
+
 @serializable(
     value=Int32,
     message=String,

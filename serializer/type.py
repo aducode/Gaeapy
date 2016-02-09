@@ -289,7 +289,7 @@ class String(BaseType):
         (is_ref, hash_code, ) = struct.unpack('<?i', ctx.read(5))
         if is_ref:
             return ctx.ref(hash_code)
-        length = struct.unpack('<i', ctx.read(4))
+        (length, ) = struct.unpack('<i', ctx.read(4))
         obj = ctx.read(length)
         ctx.ref(hash_code, obj)
         return obj
@@ -576,7 +576,7 @@ class Serializable(ProtocolType):
     def checked_type(cls, type_id, type_cls):
         excepted = register.get(type_id)
         real = type_cls
-        if not issubclass(excepted, real):
+        if excepted != Null and not issubclass(excepted, real):
             raise RuntimeError('Excepted type is [{excepted}], but real type is [{real}]'.format(excepted=excepted, real=real))
         return excepted
 

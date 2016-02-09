@@ -23,6 +23,7 @@ def recv_data(conn, buf_size=1024):
         _data += _in_buf if _in_buf else ''
         if (len(_in_buf) if _in_buf else 0) < buf_size:
             break
+    conn.close()
     return _data
 
 
