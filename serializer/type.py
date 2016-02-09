@@ -418,7 +418,7 @@ class Array(ProtocolType):
             return None
         if is_ref:
             return ctx.ref(hash_code)
-        length = struct.pack('<i', ctx.read(4))
+        (length, ) = struct.unpack('<i', ctx.read(4))
         _type = register.get(type_id)
         obj = list()
         if issubclass(_type, BaseType):
@@ -580,6 +580,8 @@ class Serializable(ProtocolType):
             raise RuntimeError('Excepted type is [{excepted}], but real type is [{real}]'.format(excepted=excepted, real=real))
         return excepted
 
+Obj = Serializable
+
 
 class Enum(ProtocolType):
 
@@ -710,6 +712,7 @@ def array(genercis=ProtocolType):
         Array.__generics_cache__[genercis] = new_cls
     return Array.__generics_cache__[genercis]
 
+
 register.reg(0, 1, Null)
 register.reg(3, Bool)
 register.reg(4, Character)
@@ -727,3 +730,4 @@ register.reg(22, KeyValue)
 register.reg(23, Array)
 register.reg(24, 25, Map)
 register.reg(26, Set)
+register.reg(2, Obj)

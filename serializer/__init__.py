@@ -41,9 +41,9 @@ from type import serializable, member
 
 b = Byte
 c = Character
-s = i16 = Int16
-i = i32 = Int32
-l = i64 = Int64
+Short = s = i16 = Int16
+Int = i = i32 = Int32
+Long = l = i64 = Int64
 f = Float
 d = Double
 decimal = Decimal

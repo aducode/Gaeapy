@@ -191,6 +191,14 @@ class ResetProtocol(Serializable):
     pass
 
 
+class Out(object):
+    """
+    输出参数，不参与序列化
+    """
+    def __init__(self, value=None):
+        self.value = value
+
+
 @serializable(
     'RpParameter',
     name=String,
@@ -204,6 +212,7 @@ class KeyValuePair(Serializable):
 
     def __str__(self):
         return 'name={name}, value={value}'.format(name=self.name, value=self.value)
+
 
 __MSG_MAP__ = {
     MsgType.Response: ResponseProtocol,

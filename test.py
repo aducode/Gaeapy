@@ -11,30 +11,35 @@
 
 from client import proxy
 from decorator import operation, service
-from serializer import String, Int32, Array
+from serializer import String, Int, Long, Array
 from serializer import Serializable, serializable
+from protocol import Out
 
 
 @serializable(
-    value=Int32,
+    value=Int,
     message=String,
 )
 class Test(Serializable):
-    pass
+
+    def __str__(self):
+        return 'value={value}, message={message}'.format(value=self.value, message=self.message)
 
 
 @proxy(('127.0.0.1', 9090))
 @service()
 class TestService(object):
 
-    @operation(args=(Array(Int32), Test, Int32, String), ret=Test)
-    def getTest(self, int_array, test, i, s):
+    @operation(args=(Array(Int), Test, Int, String, Out(Long)), ret=Test)
+    def getTest(self, int_array, test, i, s, l):
         pass
+
 
 if __name__ == '__main__':
     test_service = TestService()
     t1 = Test()
     t1.value = 100
     t1.message = "hello"
-    t2 = test_service.getTest(Array(Int32)([1, 2, 3]), t1, 111, "world")
-    print t2
+    outpara = Out(1000)
+    t2 = test_service.getTest(Array(Int)([1, 2, 3]), t1, 111, "world", outpara)
+    print t2, outpara.value

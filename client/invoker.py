@@ -12,7 +12,7 @@
 from socket import socket, AF_INET, SOCK_STREAM
 
 from protocol.protocol import MsgType, Platform
-from protocol.protocol import Protocol, RequestProtocol, KeyValuePair
+from protocol.protocol import Protocol, RequestProtocol, KeyValuePair, Out
 
 
 def recv_data(conn, buf_size=1024):
@@ -31,17 +31,28 @@ def invoker(proxy, func):
 
     def _func(*args):
 
+        type_and_values = zip(func.__args__, args)
+        params = list()
+        out_params = list()
+        for t, v in type_and_values:
+            if isinstance(t, Out):
+                if not isinstance(v, Out):
+                    raise RuntimeError('Value must be Out instance!')
+                else:
+                    out_params.append(v)
+                    params.append((t.value, v.value, ))
+            else:
+                params.append((t, v, ))
         request = RequestProtocol()
         request.lookup = proxy.implement.__class__.__service_name__
         request.methodName = func.__method_name__
         request.paraKVList = [KeyValuePair(_type.__simple_name__, value)
-                              for _type, value in zip(func.__args__, args)]
+                              for _type, value in params]
         send_protocol = Protocol(msg=request,
-                            msg_type=MsgType.Request,
-                            compress_type=proxy.compress,
-                            serialize_type=proxy.serialize,
-                            platform=Platform.Java)
-
+                                 msg_type=MsgType.Request,
+                                 compress_type=proxy.compress,
+                                 serialize_type=proxy.serialize,
+                                 platform=Platform.Java)
         conn = socket(AF_INET, SOCK_STREAM)
         conn.connect(proxy.address)
         serialized = send_protocol.to_bytes()
@@ -50,7 +61,11 @@ def invoker(proxy, func):
         receive_protocol = Protocol.from_bytes(data)
         assert(receive_protocol.msg_type == MsgType.Response)
         response = receive_protocol.msg
-        # res = func(*args)
+        response_out_params = response.outpara if response.outpara is not None else list()
+        if len(response_out_params) != len(out_params):
+            raise RuntimeError('Out parameter num not equal!')
+        for i in xrange(len(out_params)):
+            out_params[i].value = response_out_params[i]
         return response.result
 
     return _func
