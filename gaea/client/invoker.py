@@ -11,8 +11,8 @@
 
 from socket import socket, AF_INET, SOCK_STREAM
 
-from protocol.protocol import MsgType, Platform
-from protocol.protocol import Protocol, RequestProtocol, KeyValuePair, Out
+from gaea.core.protocol.protocol import MsgType, Platform
+from gaea.core.protocol.protocol import Protocol, RequestProtocol, KeyValuePair, Out
 
 
 def recv_data(conn, buf_size=1024):

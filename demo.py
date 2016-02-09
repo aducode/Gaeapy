@@ -9,11 +9,11 @@
 @time: 2016/2/1 20:21
 """
 
-from client import proxy
-from decorator import operation, service
-from serializer import String, Int, Long, Array
-from serializer import Serializable, serializable
-from protocol import Out
+from gaea.client import proxy
+from gaea.core import operation, service
+from gaea.core import String, Int, Long, Array
+from gaea.core import Serializable, serializable
+from gaea.core import Out
 
 
 @serializable(

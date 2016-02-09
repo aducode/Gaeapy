@@ -11,7 +11,7 @@
 
 import types
 
-from protocol.protocol import SerializeType, CompressType
+from gaea.core.protocol.protocol import SerializeType, CompressType
 from invoker import invoker
 
 
