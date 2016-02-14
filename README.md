@@ -35,3 +35,8 @@ if __name__ == '__main__':
     persion_service = PersionService()
     persion = persion_service.get_persion_by_id(0)
 ```
+
+### TODO
+
+> 1. 支持枚举类型
+> 2. 规范异常
