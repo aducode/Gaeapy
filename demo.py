@@ -30,8 +30,8 @@ class Test(Serializable):
 @service()
 class TestService(object):
 
-    @operation(args=(Array(Int), Test, Int, String, Out(Long)), ret=Test)
-    def getTest(self, int_array, test, i, s, l):
+    @operation(args=(Long, Array(Int), Test, Int, String, Out(Long)), ret=Test)
+    def getTest(self, t, int_array, test, i, s, l):
         pass
 
 
@@ -41,5 +41,5 @@ if __name__ == '__main__':
     t1.value = 100
     t1.message = "hello"
     outpara = Out(1000)
-    t2 = test_service.getTest(Array(Int)([1, 2, 3]), t1, 111, "world", outpara)
+    t2 = test_service.getTest(Long(1), Array(Int)([1, 2, 3]), t1, 111, "world", outpara)
     print t2, outpara.value

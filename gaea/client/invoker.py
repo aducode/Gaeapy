@@ -53,9 +53,9 @@ def invoker(proxy, func):
                                  compress_type=proxy.compress,
                                  serialize_type=proxy.serialize,
                                  platform=Platform.Java)
+        serialized = send_protocol.to_bytes()
         conn = socket(AF_INET, SOCK_STREAM)
         conn.connect(proxy.address)
-        serialized = send_protocol.to_bytes()
         conn.send(serialized)
         data = recv_data(conn)
         receive_protocol = Protocol.from_bytes(data)

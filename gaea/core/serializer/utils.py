@@ -51,7 +51,7 @@ def decide(value):
     from type import Serializable
     from type import Array
     from type import String, List, Set, KeyValue, Map
-    from type import Null, Bool, Datetime, Int32, Double
+    from type import Null, Bool, Datetime, Int32, Int64, Double
     python_type = type(value)
     if issubclass(python_type, Serializable):
         return python_type, value
@@ -78,8 +78,9 @@ def decide(value):
         return Null, value
     # 以下是默认策略
     elif python_type == int:
-        # 默认是int32,舍去溢出部分
-        return Int32, value & ((1 << 32) - 1)
+        return Int32, value
+    elif python_type == long:
+        return Int64, value
     elif python_type == float:
         # 默认double
         return Double, value

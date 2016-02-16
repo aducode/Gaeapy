@@ -76,7 +76,7 @@ class BaseType(ProtocolType):
 
 class Bool(BaseType):
 
-    __simple_name__ =  'boolean'
+    __simple_name__ = 'boolean'
 
     @classmethod
     def check(cls, value):
@@ -278,10 +278,11 @@ class String(BaseType):
     @classmethod
     def serialize(cls, value, ctx):
         is_ref, hash_code = ctx.is_ref(value)
-        length = len(value)
-        ctx.write(struct.pack('<?ii', is_ref, hash_code, length))
+        ctx.write(struct.pack('<?i', is_ref, hash_code))
         if is_ref:
             return
+        length = len(value)
+        ctx.write(struct.pack('<i', length))
         ctx.write(value)
 
     @classmethod
