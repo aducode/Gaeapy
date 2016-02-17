@@ -11,7 +11,7 @@
 
 import struct
 from ..serializer.context import Context
-from ..serializer.type import enum
+from ..serializer.type import mkenum as enum
 from ..serializer.type import Serializable, serializable
 from ..serializer.type import Any, String, List, array, Int32
 

@@ -39,6 +39,8 @@ from serializer import Map
 from serializer import KeyValue
 from serializer import Array
 
+from serializer import enum
+
 from serializer import Serializable
 from serializer import serializable
 

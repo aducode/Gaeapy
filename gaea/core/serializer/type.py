@@ -587,6 +587,18 @@ Obj = Serializable
 class Enum(ProtocolType):
 
     @classmethod
+    def name(cls, value):
+        if value not in cls.__renums__:
+            raise RuntimeError('Invalid Enum value')
+        return cls.__renums__[value]
+
+    @classmethod
+    def value(cls, key):
+        if key not in cls.__dict__:
+            raise RuntimeError('{key} not in Enum'.format(key=key))
+        return cls.__dict__[key]
+
+    @classmethod
     def check(cls, value):
         """
         有问题
@@ -595,23 +607,42 @@ class Enum(ProtocolType):
         """
         return False
 
-    def serialize(self, ctx):
-        pass
+    @classmethod
+    def serialize(cls, value, ctx):
+        type_id = register.get_id(cls)
+        ctx.write(struct.pack('<i', type_id))
+        enum_str = cls.name(value)
+        String.serialize(enum_str, ctx)
 
     @classmethod
     def deserialize(cls, ctx):
-        pass
-
-    @classmethod
-    def format(cls, vl):
-        for field, value in cls.__dict__.items():
-            if not field.startswith('__'):
-                if value == vl:
-                    return field
-        raise RuntimeError('{0} not in Enum'.format(vl))
+        type_id = struct.unpack('<i', ctx.read(4))
+        if type_id == 0:
+            return None
+        enum_str = String.deserialize(ctx)
+        return cls.value(enum_str)
 
 
-def enum(**enums):
+def enum(name, **enums):
+    """
+    创建枚举类型并且注册序列化typeid
+    :param name:
+    :param enums:
+    :return:
+    """
+    # TODO 按照现有做法，实际在invoke时，值的类型并不是Enum子类，序列化时就有问题
+    enum_cls = mkenum(**enums)
+    enum_cls.__simple_name__ = name
+    register.reg(sign(name), enum_cls)
+    return enum_cls
+
+
+def mkenum(**enums):
+    """
+    创建枚举类型
+    :param enums:
+    :return:
+    """
     check_set = set()
     for k, v in enums.items():
         if k.startswith('__'):
@@ -619,7 +650,14 @@ def enum(**enums):
         check_set.add(v)
     if len(check_set) != len(enums):
         raise RuntimeError('Multi value!')
-    return type('Enum', (Enum, ), enums)
+    fields = dict()
+    fields.update(enums)
+    renums = dict()
+    for k, v in enums.items():
+        renums[v] = k
+    fields['__renums__'] = renums
+    enum_cls = type('Enum', (Enum, ), fields)
+    return enum_cls
 
 
 class TypeInfo(object):

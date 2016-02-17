@@ -14,7 +14,9 @@ from gaea.core import operation, service
 from gaea.core import String, Int, Long, Array
 from gaea.core import Serializable, serializable
 from gaea.core import Out
+from gaea.core import enum
 
+TestType = enum('TestType', TYPE1=0, TYPE2=1)
 
 @serializable(
     value=Int,
@@ -30,8 +32,8 @@ class Test(Serializable):
 @service()
 class TestService(object):
 
-    @operation(args=(Long, Array(Int), Test, Int, String, Out(Long)), ret=Test)
-    def getTest(self, t, int_array, test, i, s, l):
+    @operation(args=(TestType, Long, Array(Int), Test, Int, String, Out(Long)), ret=Test)
+    def getTest(self, test_type, t, int_array, test, i, s, l):
         pass
 
 
@@ -41,5 +43,5 @@ if __name__ == '__main__':
     t1.value = 100
     t1.message = "hello"
     outpara = Out(1000)
-    t2 = test_service.getTest(Long(1), Array(Int)([1, 2, 3]), t1, 111, "world", outpara)
+    t2 = test_service.getTest(TestType.TYPE1, Long(1), Array(Int)([1, 2, 3]), t1, 111, "world", outpara)
     print t2, outpara.value
