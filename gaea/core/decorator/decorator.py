@@ -35,6 +35,5 @@ def operation(name=None, args=tuple(), ret=None):
         method.__method_name__ = name if name is not None else method.__name__
         method.__ret__ = ret
         method.__args__ = args if isinstance(args, tuple) else (args, )
-        method.__throw__ = throw
         return method
     return deco
