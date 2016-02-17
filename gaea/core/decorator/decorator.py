@@ -22,7 +22,7 @@ def service(name=None):
     return deco
 
 
-def operation(name=None, args=tuple(), ret=None):
+def operation(name=None, args=tuple(), ret=None, throw=None):
     """
     由于其他语言不支持kwargs参数，为了保持一致，这里也禁止使用
     :param name:
@@ -35,5 +35,6 @@ def operation(name=None, args=tuple(), ret=None):
         method.__method_name__ = name if name is not None else method.__name__
         method.__ret__ = ret
         method.__args__ = args if isinstance(args, tuple) else (args, )
+        method.__throw__ = throw
         return method
     return deco

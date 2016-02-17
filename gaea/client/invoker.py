@@ -14,6 +14,8 @@ from socket import socket, AF_INET, SOCK_STREAM
 from gaea.core.protocol.protocol import MsgType, Platform
 from gaea.core.protocol.protocol import Protocol, RequestProtocol, KeyValuePair, Out
 
+from gaea.core.exception import InternalServerException
+
 
 def recv_data(conn, buf_size=1024):
 
@@ -59,13 +61,17 @@ def invoker(proxy, func):
         conn.send(serialized)
         data = recv_data(conn)
         receive_protocol = Protocol.from_bytes(data)
-        assert(receive_protocol.msg_type == MsgType.Response)
-        response = receive_protocol.msg
-        response_out_params = response.outpara if response.outpara is not None else list()
-        if len(response_out_params) != len(out_params):
-            raise RuntimeError('Out parameter num not equal!')
-        for i in xrange(len(out_params)):
-            out_params[i].value = response_out_params[i]
-        return response.result
+        if receive_protocol.msg_type == MsgType.Response:
+            response = receive_protocol.msg
+            response_out_params = response.outpara if response.outpara is not None else list()
+            if len(response_out_params) != len(out_params):
+                raise RuntimeError('Out parameter num not equal!')
+            for i in xrange(len(out_params)):
+                out_params[i].value = response_out_params[i]
+            return response.result
+        elif receive_protocol.msg_type == MsgType.Exception:
+            exception = receive_protocol.msg
+            exp = InternalServerException(exception.errorCode, exception.toIP, exception.fromIP, exception.errorMsg)
+            raise exp
 
     return _func

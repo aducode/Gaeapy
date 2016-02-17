@@ -41,3 +41,5 @@ from serializer import Array
 
 from serializer import Serializable
 from serializer import serializable
+
+from exception import InternalServerException
