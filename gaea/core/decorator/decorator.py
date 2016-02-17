@@ -22,7 +22,7 @@ def service(name=None):
     return deco
 
 
-def operation(name=None, args=tuple(), ret=None, throw=None):
+def operation(name=None, args=tuple(), ret=None):
     """
     由于其他语言不支持kwargs参数，为了保持一致，这里也禁止使用
     :param name:
